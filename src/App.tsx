@@ -1,5 +1,4 @@
 import { For, createSignal, Show, onMount } from "solid-js";
-import "./App.css";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import CodeEditor from "./components/CodeEditor";
