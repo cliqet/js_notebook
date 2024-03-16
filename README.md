@@ -4,7 +4,12 @@
 $ npm install # or pnpm install or yarn install
 ```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+This is a client side javascript notebook where you can test your client side javascript 
+code instead of using the web browser console. It allows you to save your scripts.
+
+### NOTE: Each code cell is independent of other code cells. This means that declarations you make in a previous cell will not be accessible to other cells.
+
+### View demo site in [Client JS Notebook](http://cliqet-js-notebook.s3-website-ap-southeast-1.amazonaws.com/).
 
 ## Available Scripts
 
