@@ -1,14 +1,24 @@
-import { For, createSignal, Show } from "solid-js";
+import { For, createSignal, Show, onMount } from "solid-js";
 import "./App.css";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import CodeEditor from "./components/CodeEditor";
+import { AppContext, CodeFile } from "./context/SessionContext";
+import { useContext } from "solid-js";
 
 function App() {
-  let codeRefs: HTMLTextAreaElement[];
-  const [codeCells, setCodeCells] = createSignal<number[]>([]);
+  const ctx = useContext(AppContext);
   const [isHoveringDiv, setIsHoveringDiv] = createSignal(false);
+  let codeRefs: HTMLTextAreaElement[];
   let hoverDivRef: HTMLDivElement;
+
+  onMount(() => {
+    let files = localStorage.getItem('files');
+    if (files) {
+      let loadedFiles: CodeFile[] = JSON.parse(files);
+      ctx?.setCodeFiles(loadedFiles);
+    }
+  });
 
   const handleOnHover = () => {
     setIsHoveringDiv(true);
@@ -18,39 +28,40 @@ function App() {
     const { relatedTarget } = event;
 
     if (hoverDivRef && !hoverDivRef.contains(relatedTarget as Node)) {
-        setIsHoveringDiv(false);
+      setIsHoveringDiv(false);
     }
   };
 
   const onAddCodeCell = () => {
-    if (codeCells().length > 0) {
-      let lastValue = codeCells().at(-1) as number;
-      setCodeCells([...codeCells(), lastValue + 1]);
-    } else {
-      setCodeCells([...codeCells(), 0]);
-    }
-    
-    console.log('add cells', codeCells());
-  }
+    ctx?.setCodeFiles([...ctx.codeFiles(), { title: 'Untitled', code: ''}]);
+  };
 
   const onDeleteCodeCell = (index: number) => {
-    let newCodeCells = [...codeCells()];
+    let newCodeCells: CodeFile[] = [...ctx?.codeFiles() as CodeFile[]];
     newCodeCells.splice(index, 1);
-    setCodeCells([...newCodeCells]);
-  }
+    ctx?.setCodeFiles([...newCodeCells]);
+  };
+
+  const onSave = () => {
+    localStorage.setItem('files', JSON.stringify(ctx?.codeFiles()));
+  };
 
   return (
     <div class="w-full h-screen">
       <Header />
 
       <div class="flex flex-row h-screen">
-        <Sidebar />
+        <Sidebar saveFn={onSave} />
+
         <main class="w-5/6 bg-slate-600 flex flex-col p-3 text-white overflow-y-auto pb-96">
-          <For each={codeCells()}>
-            {(_, i) => (
-              <CodeEditor 
-                ref={codeRefs[i()]} 
+          <For each={ctx?.codeFiles()}>
+            {(file, i) => (
+              <CodeEditor
+                ref={codeRefs[i()]}
                 deleteFn={() => onDeleteCodeCell(i())}
+                fileIndex={i()}
+                title={file.title}
+                codeContent={file.code}
               />
             )}
           </For>

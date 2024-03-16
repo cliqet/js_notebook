@@ -8,15 +8,21 @@ import { oneDark } from "@codemirror/theme-one-dark";
 import PlayIcon from "../../icons/play-icon";
 import DeleteIcon from "../../icons/delete-icon";
 import TextIcon from "../../icons/text-icon";
+import { AppContext, CodeFile } from "../../context/SessionContext";
+import { useContext } from "solid-js";
 
 // declare const CodeMirror: any;
 
 type CodeEditorProps = {
   ref: HTMLTextAreaElement;
   deleteFn: () => void;
+  fileIndex: number;
+  title: string;
+  codeContent: string;
 };
 
 const CodeEditor: Component<CodeEditorProps> = (props) => {
+  const ctx = useContext(AppContext);
   let view: EditorView | undefined;
   const [code, setCurrentCode] = createSignal("");
   const [srcDoc, setSrcDoc] = createSignal("");
@@ -25,12 +31,15 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
   const [executed, setExecuted] = createSignal(false);
   let iframeRef: HTMLIFrameElement;
 
-  const onValueChange = (_: string) => {
+  const onValueChange = (codeValue: string) => {
     setTimeout(() => {
       if (!view) {
         return;
       }
       autoIndent(view);
+      
+      let newCodeFiles = [...ctx?.codeFiles() as CodeFile[]];
+      newCodeFiles[props.fileIndex].code = codeValue;
     }, 1000);
   };
 
@@ -90,15 +99,15 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
     <div class="flex flex-col mt-3 mb-3">
       <div class="my-2">
         <Show when={!isEditingTitle()}>
-            <h1 class="text-xl font-extrabold">{title()}</h1>
+          <h1 class="text-xl font-extrabold">{props.title ?? title()}</h1>
         </Show>
         <Show when={isEditingTitle()}>
-            <input
-                class="rounded-md w-1/4 bg-black p-2 font-bold" 
-                type="text" 
-                value={title()} 
-                onInput={(e) => setTitle(e.target.value)} 
-            />
+          <input
+            class="rounded-md w-1/4 bg-black p-2 font-bold"
+            type="text"
+            value={title()}
+            onInput={(e) => setTitle(e.target.value)}
+          />
         </Show>
       </div>
 
@@ -106,7 +115,14 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
         <div class="w-1/12 flex flex-col items-center">
           <button
             class="w-8 h-8 rounded-full bg-orange-600 mb-2 flex items-center justify-center"
-            onClick={() => setIsEditingTitle(!isEditingTitle())}
+            onClick={() => {
+                if (isEditingTitle()) {
+                    let newCodeFiles = [...ctx?.codeFiles() as CodeFile[]];
+                    newCodeFiles[props.fileIndex].title = title();
+                    ctx?.setCodeFiles(newCodeFiles);
+                }
+                setIsEditingTitle(!isEditingTitle());
+            }}
           >
             <TextIcon width={4} height={4} />
           </button>
@@ -131,6 +147,7 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
             onValueChange={onValueChange}
             extensions={[basicSetup, javascript({ typescript: true })]}
             theme={oneDark}
+            value={props.codeContent ?? ""}
           />
         </div>
       </div>
