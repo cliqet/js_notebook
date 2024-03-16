@@ -6,6 +6,10 @@ import CodeEditor from "./components/CodeEditor";
 import { AppContext, CodeFile } from "./context/SessionContext";
 import { useContext } from "solid-js";
 
+const STORAGE_CONFIG = {
+  FILES: 'files'
+}
+
 function App() {
   const ctx = useContext(AppContext);
   const [isHoveringDiv, setIsHoveringDiv] = createSignal(false);
@@ -13,7 +17,7 @@ function App() {
   let hoverDivRef: HTMLDivElement;
 
   onMount(() => {
-    let files = localStorage.getItem('files');
+    let files = localStorage.getItem(STORAGE_CONFIG.FILES);
     if (files) {
       let loadedFiles: CodeFile[] = JSON.parse(files);
       ctx?.setCodeFiles(loadedFiles);
@@ -43,7 +47,7 @@ function App() {
   };
 
   const onSave = () => {
-    localStorage.setItem('files', JSON.stringify(ctx?.codeFiles()));
+    localStorage.setItem(STORAGE_CONFIG.FILES, JSON.stringify(ctx?.codeFiles()));
   };
 
   return (

@@ -26,7 +26,7 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
   let view: EditorView | undefined;
   const [code, setCurrentCode] = createSignal("");
   const [srcDoc, setSrcDoc] = createSignal("");
-  const [title, setTitle] = createSignal("Untitled");
+  const [title, setTitle] = createSignal(props.title ?? "Untitled");
   const [isEditingTitle, setIsEditingTitle] = createSignal(false);
   const [executed, setExecuted] = createSignal(false);
   let iframeRef: HTMLIFrameElement;
@@ -103,10 +103,11 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
         </Show>
         <Show when={isEditingTitle()}>
           <input
+            id={`title${props.fileIndex}`}
             class="rounded-md w-1/4 bg-black p-2 font-bold"
             type="text"
-            value={title()}
-            onInput={(e) => setTitle(e.target.value)}
+            value={props.title ?? title()}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </Show>
       </div>
@@ -119,7 +120,7 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
                 if (isEditingTitle()) {
                     let newCodeFiles = [...ctx?.codeFiles() as CodeFile[]];
                     newCodeFiles[props.fileIndex].title = title();
-                    ctx?.setCodeFiles(newCodeFiles);
+                    ctx?.setCodeFiles([...newCodeFiles]);
                 }
                 setIsEditingTitle(!isEditingTitle());
             }}
@@ -141,7 +142,7 @@ const CodeEditor: Component<CodeEditorProps> = (props) => {
             <DeleteIcon width={4} height={4} />
           </button>
         </div>
-        <div class="w-11/12">
+        <div id={`codeBlock${props.fileIndex}`} class="w-11/12">
           <CodeMirror
             onEditorMount={(v: any) => (view = v)}
             onValueChange={onValueChange}
