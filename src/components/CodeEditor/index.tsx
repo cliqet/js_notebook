@@ -11,8 +11,6 @@ import TextIcon from "../../icons/text-icon";
 import { AppContext, CodeFile } from "../../context/SessionContext";
 import { useContext } from "solid-js";
 
-// declare const CodeMirror: any;
-
 type CodeEditorProps = {
   ref: HTMLTextAreaElement;
   deleteFn: () => void;
