@@ -11,6 +11,9 @@ code instead of using the web browser console. It allows you to save your script
 
 ### View demo site in [Client JS Notebook](http://cliqet-js-notebook.s3-website-ap-southeast-1.amazonaws.com/).
 
+<img width="1380" alt="Screenshot 2024-03-16 at 5 09 48 PM" src="https://github.com/cliqet/js_notebook/assets/33563820/cc7536e4-1238-4a41-9cef-11fc1dbda55f">
+
+
 ## Available Scripts
 
 In the project directory, you can run:
